@@ -91,6 +91,7 @@ def run(
     exp_name = name if name else exp_name + "_" + reid_weights.stem
     save_dir = increment_path(Path(project) / exp_name, exist_ok=exist_ok)  # increment run
     (save_dir / 'tracks' if save_txt else save_dir).mkdir(parents=True, exist_ok=True)  # make dir
+    WEIGHTS.mkdir(parents=True, exist_ok=True)  # make dir
 
     # Load model
     device = select_device(device)
