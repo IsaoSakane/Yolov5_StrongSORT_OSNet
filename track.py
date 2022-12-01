@@ -91,6 +91,7 @@ def run(
     exp_name = name if name else exp_name + "_" + reid_weights.stem
     save_dir = increment_path(Path(project) / exp_name, exist_ok=exist_ok)  # increment run
     (save_dir / 'tracks' if save_txt else save_dir).mkdir(parents=True, exist_ok=True)  # make dir
+    WEIGHTS.mkdir(parents=True, exist_ok=True)  # make dir
 
     # Load model
     device = select_device(device)
@@ -155,7 +156,7 @@ def run(
                 p, im0, _ = path, im0s.copy(), getattr(dataset, 'frame', 0)
                 p = Path(p)  # to Path
                 # video file
-                if source.endswith(VID_FORMATS):
+                if source.lower().endswith(VID_FORMATS):
                     txt_file_name = p.stem
                     save_path = str(save_dir / p.name)  # im.jpg, vid.mp4, ...
                 # folder with imgs
@@ -199,10 +200,10 @@ def run(
 
                         if save_txt:
                             # to MOT format
-                            bbox_left = output[0]
-                            bbox_top = output[1]
-                            bbox_w = output[2] - output[0]
-                            bbox_h = output[3] - output[1]
+                            bbox_left = output[0]  / im0.shape[1]
+                            bbox_top = output[1]   / im0.shape[0]
+                            bbox_w = ( output[2] - output[0] ) / im0.shape[1]
+                            bbox_h = ( output[3] - output[1] ) / im0.shape[0]
                             # Write MOT compliant results to file
                             with open(txt_path + '.txt', 'a') as f:
                                 f.write(('%g ' * 10 + '\n') % (frame_idx + 1, id, bbox_left,  # MOT format
