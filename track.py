@@ -198,26 +198,27 @@ def run(
                         id = output[4]
                         cls = output[5]
 
-                        if save_txt:
-                            # to MOT format
-                            bbox_left = output[0]  / im0.shape[1]
-                            bbox_top = output[1]   / im0.shape[0]
-                            bbox_w = ( output[2] - output[0] ) / im0.shape[1]
-                            bbox_h = ( output[3] - output[1] ) / im0.shape[0]
-                            # Write MOT compliant results to file
-                            with open(txt_path + '.txt', 'a') as f:
-                                f.write(('%g ' * 10 + '\n') % (frame_idx + 1, id, bbox_left,  # MOT format
-                                                               bbox_top, bbox_w, bbox_h, cls, -1, -1, i))
+                        if( output[2] - output[0] > 0 ): # 検出結果のleftとrightが反転した場合を除外
+                            if save_txt:
+                                # to MOT format
+                                bbox_left = output[0]  / im0.shape[1]
+                                bbox_top = output[1]   / im0.shape[0]
+                                bbox_w = ( output[2] - output[0] ) / im0.shape[1]
+                                bbox_h = ( output[3] - output[1] ) / im0.shape[0]
+                                # Write MOT compliant results to file
+                                with open(txt_path + '.txt', 'a') as f:
+                                    f.write(('%g ' * 10 + '\n') % (frame_idx + 1, id, bbox_left,  # MOT format
+                                                                bbox_top, bbox_w, bbox_h, cls, -1, -1, i))
 
-                        if save_vid or save_crop or show_vid:  # Add bbox to image
-                            c = int(cls)  # integer class
-                            id = int(id)  # integer id
-                            label = None if hide_labels else (f'{id} {names[c]}' if hide_conf else \
-                                (f'{id} {conf:.2f}' if hide_class else f'{id} {names[c]} {conf:.2f}'))
-                            annotator.box_label(bboxes, label, color=colors(c, True))
-                            if save_crop:
-                                txt_file_name = txt_file_name if (isinstance(path, list) and len(path) > 1) else ''
-                                save_one_box(bboxes, imc, file=save_dir / 'crops' / txt_file_name / names[c] / f'{id}' / f'{p.stem}.jpg', BGR=True)
+                            if save_vid or save_crop or show_vid:  # Add bbox to image
+                                c = int(cls)  # integer class
+                                id = int(id)  # integer id
+                                label = None if hide_labels else (f'{id} {names[c]}' if hide_conf else \
+                                    (f'{id} {conf:.2f}' if hide_class else f'{id} {names[c]} {conf:.2f}'))
+                                annotator.box_label(bboxes, label, color=colors(c, True))
+                                if save_crop:
+                                    txt_file_name = txt_file_name if (isinstance(path, list) and len(path) > 1) else ''
+                                    save_one_box(bboxes, imc, file=save_dir / 'crops' / txt_file_name / names[c] / f'{id}' / f'{p.stem}.jpg', BGR=True)
 
                 LOGGER.info(f'{s}Done. yolo:({t3 - t2:.3f}s), {tracking_method}:({t5 - t4:.3f}s)')
 
