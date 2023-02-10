@@ -198,7 +198,7 @@ def run(
                         id = output[4]
                         cls = output[5]
 
-                        if( ( output[2] - output[0] > 0 ) and () output[3] - output[1] > 0 ) ): # 検出結果のleftとrightが反転した場合を除外
+                        if( ( output[2] - output[0] > 0 ) and ( output[3] - output[1] > 0 ) ): # 検出結果の(leftとright)/(topとbottom)が反転した場合を除外
                             if save_txt:
                                 # to MOT format
                                 bbox_left = output[0]  / im0.shape[1]
