@@ -99,6 +99,10 @@ def run(
     stride, names, pt = model.stride, model.names, model.pt
     imgsz = check_img_size(imgsz, s=stride)  # check image size
 
+    person_id = next( map( lambda x:x[0],  filter( lambda x:x[1] == 'person', names.items() ) ) )
+    def IsExcludeObject( cls:int ):
+        return cls == person_id
+
     # Dataloader
     if webcam:
         show_vid = check_imshow()
@@ -197,9 +201,9 @@ def run(
                         bboxes = output[0:4]
                         id = output[4]
                         cls = output[5]
-
+                        c = int(cls)  # integer class
                         if( ( output[2] - output[0] > 0 ) and ( output[3] - output[1] > 0 ) ): # 検出結果の(leftとright)/(topとbottom)が反転した場合を除外
-                            if save_txt:
+                            if save_txt  and not IsExcludeObject( c ):
                                 # to MOT format
                                 bbox_left = output[0]  / im0.shape[1]
                                 bbox_top = output[1]   / im0.shape[0]
@@ -211,7 +215,6 @@ def run(
                                                                 bbox_top, bbox_w, bbox_h, cls, -1, -1, i))
 
                             if save_vid or save_crop or show_vid:  # Add bbox to image
-                                c = int(cls)  # integer class
                                 id = int(id)  # integer id
                                 label = None if hide_labels else (f'{id} {names[c]}' if hide_conf else \
                                     (f'{id} {conf:.2f}' if hide_class else f'{id} {names[c]} {conf:.2f}'))
